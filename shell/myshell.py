@@ -9,7 +9,7 @@ def printPrompt():
 
 def getExec_path(command):
     # search path on system for a command matching executable
-    paths = os.getenv("PATH", "").split(":")
+    paths = os.getenv("PATH").split(":")
     for path in paths:
         executablePath = os.path.join(path, command)
         if os.path.exists(executablePath):
@@ -88,24 +88,27 @@ def pipe_handler(command1, command2):
         print(f'Error: {e}')
 
 def shellCommands(command):
-    execCmd, operators = getExec_path(command)
-    if 'cd' in execCmd:
+    execCmd, operators = getCommands_operators(command)
+    if "cd" in execCmd:
         cdInd = execCmd.index("cd")
 
         if cdInd + 1 < len(execCmd):
             try:
                 os.chdir(execCmd[cdInd+1])
-                execCmd.pop(cdIndex+1)
+                execCmd.pop(cdInd+1)
                 execCmd.remove("cd")
             except FileNotFoundError:
                 print("Directory not found")
         else:
                 print("Format: cd <dir>")
-    elif 'echo' in execCmd:
+    elif "echo" in execCmd:
         echoInd = execCmd.index("echo")
-
         print(" ".join(execCmd[echoInd+1:]))
         execCmd = execCmd[echoInd:]
+    elif "pwd" in execCmd:
+        pwdInd = execCmd.index("pwd")
+        curPWD = os.getcwd()
+        print(" ".join(curPWD))
     else:
         pid = os.fork()
         if pid == 0:
@@ -143,5 +146,5 @@ def shell():
         else:
             shellCommands(userInput)
 
-if __name__ = "__main__":
+if __name__ == "__main__":
     shell()
